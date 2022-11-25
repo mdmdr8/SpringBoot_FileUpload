@@ -63,11 +63,12 @@ public class BoardService {
         board1.setContent(content);
         boardrepository.save(board1);
 	}
+	
 	public List<Board> boardPage(PageInfo pageInfo) throws Exception{
+		
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5, Sort.by(Sort.Direction.DESC, "id"));
 		
 		Page<Board> pages = boardrepository.findAll(pageRequest);
-		
 		int maxPage = pages.getTotalPages();
 		int startPage = pageInfo.getCurPage()/10*10+1; //start page를 1,11,21,31
 		int endPage = startPage + 10 -1; //10, 20,30
@@ -78,5 +79,15 @@ public class BoardService {
 		pageInfo.setEndPage(endPage);
 		
 		return pages.getContent();
+	}
+	
+	public Integer deleteBoard( Integer id, String password) throws Exception{
+		Optional<Board> dBoard =boardrepository.findById(id);
+		if(dBoard.isEmpty()) return -1;
+		Board board = dBoard.get();
+		if(board.getPassword().equals(password)==false) return -2 ;
+		boardrepository.deleteById(id);
+		return 0;
+	
 	}
 }

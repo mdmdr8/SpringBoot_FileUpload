@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -121,8 +122,9 @@ public class BoardController {
 			return res;
 		}
 //		@PathVariable : URL상에 경로의 일부를 파라미터로 사용하기 위해
-		@PostMapping("/update/{id}")
-		public ResponseEntity<String> updateBoard(@PathVariable Integer id, String subject, String content){
+		@PutMapping("/update/{id}")
+		public ResponseEntity<String> updateBoard(@PathVariable Integer id, @RequestParam("subject") String subject, 
+				@RequestParam("content") String content){
 			System.out.println("여기 왔어");
 			ResponseEntity<String> res=null;
 			try {
@@ -145,7 +147,6 @@ public class BoardController {
 			try {
 				PageInfo pageInfo = new PageInfo();
 				pageInfo.setCurPage(page);
-				pageInfo.setCurPage(page);
 				List<Board> boards = boardService.boardPage(pageInfo);
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("pageInfo", pageInfo);
@@ -157,4 +158,19 @@ public class BoardController {
 			}
 			return res;
 		}
+		
+		@PutMapping("/delete/{id}")
+		public ResponseEntity<Integer> delete(@PathVariable Integer id,
+			@RequestParam("password") String password) {
+				ResponseEntity<Integer> res = null;
+				System.out.println(password);
+				try {
+					Integer msgno = boardService.deleteBoard(id, password);
+					res = new ResponseEntity<Integer> (msgno,HttpStatus.OK);
+				}catch(Exception e){
+					e.printStackTrace();
+					res =new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
+				}
+				return res;
+			}
 }
